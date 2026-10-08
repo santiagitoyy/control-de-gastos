@@ -1,6 +1,6 @@
-const V = 'cuentas-v2';
-const FILES = ['./', 'index.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'apple-touch-icon.png'];
-self.addEventListener('install', e => { e.waitUntil(caches.open(V).then(c => c.addAll(FILES))); self.skipWaiting(); });
+const V = 'cuentas-v3';
+const FILES = ['./', 'index.html', 'manifest.webmanifest', 'icon-192%20(4).png', 'icon-512%20(3).png', 'apple-touch-icon%20(1).png'];
+self.addEventListener('install', e => { e.waitUntil(caches.open(V).then(c => Promise.allSettled(FILES.map(f => c.add(f))))); self.skipWaiting(); });
 self.addEventListener('activate', e => {
   e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== V).map(k => caches.delete(k)))));
   self.clients.claim();
