@@ -9,8 +9,8 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Cuentas">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="apple-touch-icon%20(1).png">
-<link rel="icon" href="icon-192%20(4).png" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png" type="image/png">
 <title>Cuentas</title>
 <style>
 :root{--bg:#f2f2f7;--card:#fff;--tx:#000;--tx2:#8e8e93;--sep:rgba(60,60,67,.16);--blue:#007aff;--green:#34c759;--red:#ff3b30;--purple:#af52de;--seg:rgba(118,118,128,.12);--bar:rgba(249,249,249,.82)}
@@ -110,6 +110,7 @@ const save=()=>{try{localStorage.setItem(K,JSON.stringify(tx))}catch{}};
 let tx=load();
 let S={tab:'res',mode:'sem',off:0,filter:'all',metric:'gasto',sel:null};
 let D=null;
+let deferredInstall=null;
 
 const money=new Intl.NumberFormat('es-MX',{style:'currency',currency:'MXN',maximumFractionDigits:0});
 const money2=new Intl.NumberFormat('es-MX',{style:'currency',currency:'MXN'});
@@ -209,7 +210,7 @@ function vMov(){
 }
 
 function vSet(){
-  return `<h1>Ajustes</h1>
+  return `<h1>Ajustes</h1>${deferredInstall?`<h2>Aplicación</h2><div class="list"><button class="link" data-a="install">Instalar app en este dispositivo</button></div>`:''}
   <h2>Respaldo</h2>
   <div class="list"><button class="link" data-a="export">Exportar copia de seguridad</button><button class="link" data-a="import">Importar copia de seguridad</button></div>
   <p class="foot">Tus datos se guardan solo en este teléfono. Exporta una copia de vez en cuando por si cambias de equipo o borras los datos del navegador.</p>
@@ -281,6 +282,7 @@ document.addEventListener('click',e=>{
       setTimeout(()=>URL.revokeObjectURL(l.href),2000);break;
     }
     case 'import': $('#file').click();break;
+    case 'install': if(deferredInstall){deferredInstall.prompt();deferredInstall=null;render()}break;
     case 'wipe': if(confirm('Se borrarán todos tus movimientos. ¿Continuar?')){tx=[];save();render()}break;
   }
 });
@@ -296,6 +298,8 @@ $('#file').addEventListener('change',async e=>{
   e.target.value='';
 });
 
+addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstall=e;if(S.tab==='set')render()});
+addEventListener('appinstalled',()=>{deferredInstall=null;if(S.tab==='set')render()});
 render();
 if('serviceWorker' in navigator) addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 </script>
